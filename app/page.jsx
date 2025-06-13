@@ -176,6 +176,10 @@ export default function Home() {
         </Button>
       </div>
       </section>
+
+      <footer className="border-t bg-gray-50 py-12 text-center text-sm text-muted-foreground">
+       🖥️ Made with financial freedom in mind 💸 
+      </footer>
     </div>
   );
 }
