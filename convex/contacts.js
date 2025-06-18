@@ -1,4 +1,5 @@
-import { query } from "./_generated/server";
+import { v } from "convex/values";
+import { mutation, query } from "./_generated/server";
 
 export const getAllContacts = query({
   handler: async (ctx) => {
@@ -68,10 +69,44 @@ export const getAllContacts = query({
     contactUsers.sort((a, b) => a?.name.localCompare(b?.name));
     userGroups.sort((a, b) => a.name.localeCompare(b.name));
 
-      //filtering out null values from contact users and returning
+    //filtering out null values from contact users and returning
     return {
       users: contactUsers.filter(Boolean),
       groups: userGroups,
     };
+  },
+});
+
+export const createGroup = mutation({
+  args: {
+    name: v.string(),
+    description: v.optional(v.string()),
+    members: v.array(v.id("users")),
+  },
+  handler: async (ctx, args) => {
+    const currentUser = await ctx.runQuery(internalAction.users.getCurrentUser);
+
+    if (!args.name.trim()) throw new Error("Group name cannot be empty");
+
+    const uniqueMembers = new Set(args.members);
+
+    uniqueMembers.add(currentUser._id);
+
+    //making sure users are legit
+    for (const id of uniqueMembers) {
+      if (!(await ctx.db.get(id)))
+        throw new Error(`User with ID ${id} not found`);
+    }
+
+    return await ctx.db.insert("groups", {
+      name: args.name.trim(),
+      description: args.description?.trim() ?? "",
+      createdBy: currentUser._id,
+      members: [...uniqueMembers].map((id) => ({
+        userId: id,
+        role: id === currentUser._id ? "admin" : "member",
+        joinedAt: Date.now(),
+      })),
+    });
   },
 });
