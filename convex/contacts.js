@@ -50,5 +50,28 @@ export const getAllContacts = query({
           : null;
       })
     );
+
+    //groups
+    const userGroups = (await ctx.db.query("groups").collect()).filter((g) =>
+      g.members
+        .some((m) => m.userId === currentUser._id)
+        .map((g) => ({
+          id: g._id,
+          name: g.name,
+          description: g.description,
+          memberCount: g.members.length,
+          type: "group", //add type marker to distinguish from users
+        }))
+    );
+
+    //sort results alphabetically by name
+    contactUsers.sort((a, b) => a?.name.localCompare(b?.name));
+    userGroups.sort((a, b) => a.name.localeCompare(b.name));
+
+      //filtering out null values from contact users and returning
+    return {
+      users: contactUsers.filter(Boolean),
+      groups: userGroups,
+    };
   },
 });
