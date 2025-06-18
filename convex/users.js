@@ -37,17 +37,17 @@ export const store = mutation({
 });
 
 export const getCurrentUser = query({
-  handler: async () => {
-    const identity = await ctx.auth.getUserIdentity();
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity(ctx);
     if (!identity) {
       throw new Error("Not Authenticated");
     }
 
     const user = await ctx.db
       .query("users")
-      .withIndex("by_token", (q) => {
-        q.eq("tokenIdentifier", identity.tokenIdentifier);
-      })
+      .withIndex("by_token", (q) => 
+        q.eq("tokenIdentifier", identity.tokenIdentifier)
+      )
       .first();
 
     if (!user) {
