@@ -18,8 +18,20 @@ import { api } from "@/convex/_generated/api";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { UserPlus } from "lucide-react";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { UserPlus, X } from "lucide-react";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 
 const groupSchema = z.object({
   name: z.string().min(1, "Group name is required"),
@@ -37,6 +49,13 @@ const CreateGroupModal = ({ isOpen, onClose, onSuccess }) => {
     { query: searchQuery }
   );
 
+  const addMember = (user) => {
+    if (!selectedMembers.some((m) => m.id === user.id)) {
+      setSelectedMembers([...selectedMembers, user]);
+    }
+    setCommandOpen(false);
+  };
+
   const {
     register,
     handleSubmit,
@@ -49,6 +68,10 @@ const CreateGroupModal = ({ isOpen, onClose, onSuccess }) => {
       descrption: "",
     },
   });
+
+  const removeMember = (userId) => {
+    setSelectedMembers(selectedMembers.filter((m) => m.id !== userId));
+  };
 
   const handleClose = () => {
     //reset the form
@@ -100,21 +123,105 @@ const CreateGroupModal = ({ isOpen, onClose, onSuccess }) => {
               )}
 
               {/* selected members */}
+              {selectedMembers.map((member) => (
+                <Badge
+                  key={member.id}
+                  variant="secondary"
+                  className="px-3 py-1"
+                >
+                  <Avatar className="h-5 w-5 mr-2">
+                    <AvatarImage src={member.imageUrl} />
+                    <AvatarFallback>
+                      {member.name?.charAt(0) || "?"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span>{member.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeMember(member.id)}
+                    className="ml-2 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
 
               {/* add user to selected members */}
-              <Popover>
-                <PopoverTrigger>
-                  <Button type='button'
-                  variant='outline'
-                  size='sm'
-                  className='h-8 gap-1 text-xs'
+              <Popover open={commandOpen} onOpenChange={setCommandOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="h-8 gap-1 text-xs"
                   >
-                    <UserPlus className="h-3.5 w-3.5"/>
+                    <UserPlus className="h-3.5 w-3.5" />
                     Add member
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent>
-                  Place content for the popover here.
+                <PopoverContent className="p-0" align="start" side="bottom">
+                  <Command>
+                    <CommandInput
+                      placeholder="Search by name or email..."
+                      value={searchQuery}
+                      onValueChange={setSearchQuery}
+                    />
+                    <CommandList>
+                      <CommandEmpty>
+                        {searchQuery.length < 2 ? (
+                          <p
+                            className="py-3 px-4 
+                      text-sm text-center text-muted-foreground"
+                          >
+                            Type at least 2 characters to search
+                          </p>
+                        ) : isSearching ? (
+                          <p
+                            className="py-3 px-4 text-sm text-center 
+                          text-muted-foreground"
+                          >
+                            Searching...
+                          </p>
+                        ) : (
+                          <p
+                            className="py-3 px-4 text-sm text-center
+                           text-muted-foreground"
+                          >
+                            No users found
+                          </p>
+                        )}
+                      </CommandEmpty>
+                      <CommandGroup heading="Users">
+                        {searchResults?.map((user) => (
+                          <CommandItem
+                            key={user.id}
+                            value={user.name + user.email}
+                            onSelect={() => addMember(user)}
+                          >
+                            <div
+                              className="flex items-center gap-2
+                            "
+                            >
+                              <Avatar className="h-6 w-6">
+                                <AvatarImage src={user.imageUrl} />
+                                <AvatarFallback>
+                                  {user.name?.charAt(0) || "?"}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div className="flex flex-col">
+                                <span className="text-sm">{user.name}</span>
+                                <span className="text-xs text-muted-foreground">
+                                  {user.email}
+                                </span>
+                              </div>
+                            </div>
+                          </CommandItem>
+                        ))}
+                        <CommandItem>Search Emoji</CommandItem>
+                        <CommandItem>Calculator</CommandItem>
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
                 </PopoverContent>
               </Popover>
             </div>

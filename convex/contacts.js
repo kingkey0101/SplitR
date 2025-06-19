@@ -1,3 +1,5 @@
+'use client'
+
 import { internal } from "./_generated/api";
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
