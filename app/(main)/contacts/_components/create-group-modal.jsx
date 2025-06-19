@@ -1,32 +1,53 @@
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import React from 'react'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import React from "react";
+import { useForm } from "react-hook-form";
+import {zodResolver} from '@hookform/resolvers/zod'
+import { z } from "zod";
 
-const CreateGroupModal = ({isOpen, onClose, onSuccess}) => {
+const groupSchema = z.object({
+  name:z.string().min(1,'Group name is required'),
+  descrption: z.string().optional(),
+})
 
-
-    const handleClose = ()=>{
-        
-        //reset the form
-
-        onClose()
+const CreateGroupModal = ({ isOpen, onClose, onSuccess }) => {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm({
+    resolver: zodResolver(groupSchema),
+    defaultValues:{
+      name:'',
+      descrption:'',
     }
+  });
+
+  const handleClose = () => {
+    //reset the form
+    reset();
+    onClose();
+  };
   return (
-   <Dialog open={isOpen} onOpenChange={handleClose}>
-  <DialogContent>
-    <DialogHeader>
-      <DialogTitle>Are you absolutely sure?</DialogTitle>
-      <DialogDescription>
-        This action cannot be undone. This will permanently delete your account
-        and remove your data from our servers.
-      </DialogDescription>
-    </DialogHeader>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create New Group</DialogTitle>
+        </DialogHeader>
 
-    <DialogFooter>
-        Footer
-    </DialogFooter>
-  </DialogContent>
-</Dialog>
-  )
-}
+        <form action=""></form>
 
-export default CreateGroupModal
+        <DialogFooter>Footer</DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default CreateGroupModal;
