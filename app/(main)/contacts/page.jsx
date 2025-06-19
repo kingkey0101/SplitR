@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 const ContactsPage = () => {
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
   const { data, isLoading } = useConvexQuery(api.contacts.getAllContacts);
-  const router = useRouter()
+  const router = useRouter();
 
   if (isLoading) {
     return (
@@ -24,8 +24,9 @@ const ContactsPage = () => {
     );
   }
 
-  const { users, groups } = data || { users: [], groups: [] };
-
+  // const { users, groups } = data || { users: [], groups: [] };
+  const users = data?.users || [];
+  const groups = data?.groups || [];
   return (
     <div className="container mx-auto py-6">
       <div className="flex items-center justify-between mb-6">
