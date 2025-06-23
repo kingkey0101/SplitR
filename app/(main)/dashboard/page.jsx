@@ -1,6 +1,14 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { api } from "@/convex/_generated/api";
 import { useConvexQuery } from "@/hooks/use-convex-query";
 import { PlusCircleIcon } from "lucide-react";
@@ -47,6 +55,81 @@ const DashboardPage = () => {
                 Add Expense
               </Link>
             </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  Total Balance
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">
+                  {balances.totalBalance > 0 ? (
+                    <span className="text-green-600">
+                      +${balances?.totalBalance.toFixed(2)}
+                    </span>
+                  ) : balances?.totalBalance < 0 ? (
+                    <span className="text-red-600">
+                      -${Math.abs(balances?.totalBalance).toFixed(2)}
+                    </span>
+                  ) : (
+                    <span>$0.00</span>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {balances?.totalBalance > 0
+                    ? "You are owed money"
+                    : balances?.totalBalance > 0
+                      ? "You owe mone"
+                      : "All settled up!"}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  You Are Owed
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-600">
+                  ${balances?.youAreOwed.toFixed(2)}
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  From {balances?.oweDetails?.youAreOwedBy?.length || 0} people
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium text-muted-foreground">
+                  You Owe
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                {balances?.oweDetails?.youOwe?.length > 0 ? (
+                  <>
+                    <div className="text-2xl font-bold text-red-600">
+                      ${balances?.youOwe.toFixed(2)}
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      To {balances?.oweDetails?.youOwe?.length || 0} people
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <div className="text-2xl font-bold">$0.00</div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      You don't owe anyone
+                    </p>
+                  </>
+                )}
+              </CardContent>
+            </Card>
           </div>
         </>
       )}
