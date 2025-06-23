@@ -61,5 +61,41 @@ export const getExpensesBetweenUsers = query({
         )
       )
       .collect();
+    //sort in descending order
+    settlements.sort((a, b) => b.date - a.date);
+
+    //computing rinning balance
+    let balance = 0;
+    for await (const e of expenses) {
+      if (e.paidByUserId === me._id) {
+        const split = e.splits.find((s) => s.userId === me._id && !s.paid);
+        if (split) balance += split.amount; //they owe user
+      } else {
+        const split = e.splits.find((s) => s.userId === me._id && !s.paid);
+        if (split) balance -= split.amount; //user owes them
+      }
+    }
+
+    for (const s of settlements) {
+      if (s.paidByUserId === me._id)
+        balance += s.amount; //user paid them back
+      else balance -= s.amount; //they paid user back
+    }
+
+    // return payload
+    const other = await ctx.db.get(userId);
+    if (!other) throw new Error("User not found");
+
+    return {
+      expenses,
+      settlements,
+      otherUser: {
+        id: other._id,
+        name: other.name,
+        email: other.email,
+        imageUrl: other.imageUrl,
+      },
+      balance,
+    };
   },
 });
