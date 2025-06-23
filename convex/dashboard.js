@@ -112,13 +112,14 @@ export const getTotalSpent = query({
     const startOfYear = new Date(currentYear, 0, 1).getTime();
     const expenses = await ctx.db
       .query("expenses")
-      .withIndex("by_date", (q) => q.gte("date", startOfYear));
+      .withIndex("by_date", (q) => q.gte("date", startOfYear))
+      .collect();
 
     //filter expenses to only include those where the user is involved
     const userExpenses = expenses.filter(
       (expense) =>
         expense.paidByUserId === user._id ||
-        expense.splits.some((split) => split.userId === user._id)
+        expense.splits?.some((split) => split.userId === user._id)
     );
 
     //calculating total spent
@@ -156,7 +157,7 @@ export const getMonthlySpending = query({
     const userExpenses = allExpenses.filter(
       (expense) =>
         expense.paidByUserId === user._id ||
-        expense.splits.some((split) => split.userId === userId)
+        expense.splits.some((split) => split.userId === user._id)
     );
 
     const monthlyTotals = {};
@@ -249,9 +250,8 @@ export const getUserGroups = query({
             q.and(
               q.eq(q.field("groupId"), group._id),
               q.or(
-                q
-                  .eq(q.field("paidByUserId"), user._id)
-                  .q.eq(q.field("receivedByUserId"), user._id)
+                q.eq(q.field("paidByUserId"), user._id),
+                q.eq(q.field("receivedByUserId"), user._id)
               )
             )
           )
