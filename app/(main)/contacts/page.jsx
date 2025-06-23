@@ -6,16 +6,30 @@ import { Card, CardContent } from "@/components/ui/card";
 import { api } from "@/convex/_generated/api";
 import { useConvexQuery } from "@/hooks/use-convex-query";
 import { Plus, User, Users } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BarLoader } from "react-spinners";
 import CreateGroupModal from "./_components/create-group-modal";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 const ContactsPage = () => {
   const [isCreateGroupModalOpen, setIsCreateGroupModalOpen] = useState(false);
   const { data, isLoading } = useConvexQuery(api.contacts.getAllContacts);
   const router = useRouter();
+  //making modal open when clicking create new group under dashboard-yourgroups-grouplist
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const createGroupParam = searchParams.get("createGroup");
+    if (createGroupParam === "true") {
+      setIsCreateGroupModalOpen(true);
+
+      const url = new URL(window.location.href);
+      url.searchParams.delete("createGroup");
+
+      router.replace(url.pathname + url.search);
+    }
+  }, [searchParams, router]);
 
   if (isLoading) {
     return (

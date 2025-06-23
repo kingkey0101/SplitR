@@ -6,16 +6,19 @@ import {
   CardAction,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { api } from "@/convex/_generated/api";
 import { useConvexQuery } from "@/hooks/use-convex-query";
-import { PlusCircleIcon } from "lucide-react";
+import { ChevronRight, PlusCircleIcon, Users } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { BarLoader } from "react-spinners";
 import ExpenseSummary from "./componants/expense-summary";
+import BalanceSummary from "./componants/balance-summary";
+import GroupList from "./componants/group-list";
 
 const DashboardPage = () => {
   const { data: balances, isLoading: balancesLoading } = useConvexQuery(
@@ -40,7 +43,7 @@ const DashboardPage = () => {
     monthlySpendingLoading;
 
   return (
-    <div>
+    <div className="container mx-auto py-6 space-y-6">
       {isLoading ? (
         <div className="w-full py-12 flex justify-center">
           <BarLoader width={"100%"} color="#36d7b7" />
@@ -136,12 +139,51 @@ const DashboardPage = () => {
             {/* left column */}
             <div className="lg:col-span-2 space-y-6">
               {/* Expense Summary */}
-              <ExpenseSummary />
+              <ExpenseSummary
+                monthlySpending={monthlySpending}
+                totalSpent={totalSpent}
+              />
             </div>
             {/* right column */}
             <div className="space-y-6">
               {/* Balance Details */}
+              <Card>
+                <CardHeader className="pb-3 flex items-center justify-between">
+                  <CardTitle>Balance Details</CardTitle>
+                  <Button variant="link" asChild className="p-0">
+                    <Link href="/contacts">
+                      View All
+                      <ChevronRight className="ml-1 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <BalanceSummary balances={balances} />
+                </CardContent>
+              </Card>
               {/* Groups */}
+              <Card>
+                <CardHeader className="pb-3 flex items-center justify-between">
+                  <CardTitle>Your Groups</CardTitle>
+                  <Button variant="link" asChild className="p-0">
+                    <Link href="/contacts">
+                      View All
+                      <ChevronRight className="ml-1 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </CardHeader>
+                <CardContent>
+                  <GroupList groups={groups} />
+                </CardContent>
+                <CardFooter>
+                  <Button variant="outline" asChild className="w-full">
+                    <Link href="/contacts?createGroup=true">
+                      <Users className="mr-2 h-4 w-4" />
+                      Create new group
+                    </Link>
+                  </Button>
+                </CardFooter>
+              </Card>
             </div>
           </div>
         </>
