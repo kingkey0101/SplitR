@@ -1,6 +1,10 @@
 "use client";
+import ExpenseList from "@/components/expense-list";
+import SettlementsList from "@/components/settlements-list";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/convex/_generated/api";
 import { useConvexQuery } from "@/hooks/use-convex-query";
 import { ArrowLeft, ArrowLeftRight, PlusCircle } from "lucide-react";
@@ -32,7 +36,7 @@ const PersonPage = () => {
   const balance = data?.balance || 0;
 
   return (
-    <div>
+    <div className="container mx-auto py-6 max-w-4xl">
       <div className="mb-6">
         <Button
           variant="outline"
@@ -72,6 +76,71 @@ const PersonPage = () => {
           </div>
         </div>
       </div>
+
+      <Card className="mb-6">
+        <CardHeader className={"pb-2"}>
+          <CardTitle className="text-xl">Balance</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex justify-between items-center">
+            <div>
+              {balance === 0 ? (
+                <p>You are all settled up</p>
+              ) : balance > 0 ? (
+                <p>
+                  <span className="font-medium">{otherUser?.name}</span> owes
+                  you
+                </p>
+              ) : (
+                <p>
+                  You owe <span className="font-medium">{otherUser?.name}</span>
+                </p>
+              )}
+            </div>
+            <div
+              className={`text-2xl font-bold ${
+                balance > 0
+                  ? "text-green-600"
+                  : balance < 0
+                    ? "text-red-600"
+                    : ""
+              }`}
+            >
+              ${Math.abs(balance).toFixed(2)}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      <Tabs
+        defaultValue="expenses"
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-4"
+      >
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="expenses">
+            Expenses ({expenses.length})
+          </TabsTrigger>
+          <TabsTrigger value="settlements">
+            Settlements ({settlements.length})
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="expenses" className="space-y-4">
+          <ExpenseList
+          key={expenses}
+            expenses={expenses}
+            showOtherPerson={false}
+            otherPersonId={params.id}
+            userLookupMap={{ [otherUser.id]: otherUser }}
+          />
+        </TabsContent>
+        <TabsContent value="settlements" className="space-y-4">
+          <SettlementsList
+            settlements={settlements}
+            userLookupMap={{ [otherUser.id]: otherUser }}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
