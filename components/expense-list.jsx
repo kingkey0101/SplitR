@@ -71,7 +71,7 @@ const ExpenseList = ({
         const showDeleteOption = canDeleteExpense(expense);
 
         return (
-          <Card key={expense.id}>
+          <Card key={expense._id || expense.id}>
             <CardContent className="py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">

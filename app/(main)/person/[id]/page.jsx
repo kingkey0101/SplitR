@@ -127,7 +127,7 @@ const PersonPage = () => {
         </TabsList>
         <TabsContent value="expenses" className="space-y-4">
           <ExpenseList
-          key={expenses}
+            key={expenses._id || expenses.id}
             expenses={expenses}
             showOtherPerson={false}
             otherPersonId={params.id}
