@@ -1,11 +1,7 @@
-import React from 'react'
+import React from "react";
 
 const GroupPage = () => {
-  return (
-    <div>
-      
-    </div>
-  )
-}
+  return <div>GroupPage</div>;
+};
 
-export default GroupPage
+export default GroupPage;
