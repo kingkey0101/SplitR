@@ -61,7 +61,7 @@ export const getGroupExpenses = query({
       });
     });
 
-    for (const ex of expenses) {
+    for (const exp of expenses) {
       const payer = exp.paidByUserId;
 
       for (const split of exp.splits) {
@@ -84,6 +84,29 @@ export const getGroupExpenses = query({
       //update ledger: reduce what the payer owes to the receiver
       ledger[s.paidByUserId][s.receivedByUserId] -= s.amount;
     }
+
+    //simplify the ledger(reducing circular debt pattern)
+    ids.forEach((a) => {
+      ids.forEach((b) => {
+        if (a >= b) return;
+
+        //calculate net debt between two users
+        const diff = ledger[a][b] - ledger[b][a];
+        if (diff > 0) {
+          //user a owes user b (net)
+          ledger[a][b] = diff;
+          ledger[b][a] = 0;
+        } else if (diff < 0) {
+          //user b owes user a
+          ledger[b][a] = -diff;
+          ledger[a][b] = 0;
+        } else {
+          //they are even
+          ledger[a][b] = ledger[b][a] = 0;
+        }
+      });
+    });
+
     //format response data-> create comprehensive balance object for each member
     const balance = memberDetails.map((m) => ({
       ...m,
@@ -111,7 +134,7 @@ export const getGroupExpenses = query({
       members: memberDetails, //all group memebers w/details
       expenses, //all expenses in this group
       settlements, //all settlements in this group
-      balances, //calculated balance info for each member
+      balances: balance, //calculated balance info for each member
       userLookupMap, //quick lookup for user details
     };
   },

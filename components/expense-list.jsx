@@ -88,7 +88,7 @@ const ExpenseList = ({
                         <>
                           <span>•</span>
                           <span>
-                            {isCurrentUserPayer ? "You" : payer.name}paid
+                            {isCurrentUserPayer ? "You" : payer.name} paid
                           </span>
                         </>
                       )}
