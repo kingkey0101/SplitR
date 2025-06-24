@@ -8,6 +8,7 @@ import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const ExpenseList = ({
   expenses,
@@ -129,8 +130,27 @@ const ExpenseList = ({
                 </div>
               </div>
               <div className="mt-3 text-sm flex gap-2 flex-wrap">
-                {expense.split.map((split, idx)=>{
-                    
+                {expense.splits.map((split, idx) => {
+                  const splitUser = getUserDetails(split.userId, expense);
+                  const isCurrentUser = split.userId === currentUser?._id;
+
+                  return (
+                    <Badge
+                      key={idx}
+                      variant={split.paid ? "outline" : "secondary"}
+                      className="flex items-center gap-1"
+                    >
+                      <Avatar className="h-4 w-4">
+                        <AvatarFallback>
+                          {splitUser.name?.charAt(0) || "?"}
+                        </AvatarFallback>
+                      </Avatar>
+                      <span>
+                        {isCurrentUser ? "You" : splitUser.name}: $
+                        {split.amount.toFixed(2)}
+                      </span>
+                    </Badge>
+                  );
                 })}
               </div>
             </CardContent>
