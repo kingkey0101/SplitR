@@ -30,9 +30,9 @@ const ParticipantSelector = ({ participants, onParticipantsChange }) => {
   );
 
   //add a participant
-  const addParticipants = (user) => {
+  const addParticipant = (user) => {
     //check if already added
-    if (participants.some((q) => p.id === user.id)) {
+    if (participants.some((q) => q.id === user.id)) {
       return;
     }
 

@@ -91,6 +91,7 @@ const SplitSelector = ({
           amount: (amount * newPercentage) / 100,
         };
       }
+      return split;
     });
 
     setSplits(updatedSplits);
@@ -147,8 +148,6 @@ const SplitSelector = ({
     if (onSplitsChange) {
       onSplitsChange(updatedSplits);
     }
-
-    onSplitsChange(newSplits);
   };
 
   //check if totals are valid
@@ -156,7 +155,7 @@ const SplitSelector = ({
   const isAmountValid = Math.abs(totalAmount - amount) < 0.01;
 
   return (
-    <div>
+    <div className="mt-4 space-y-4">
       {splits.map((split) => (
         <div
           key={split.userId}
@@ -206,6 +205,30 @@ const SplitSelector = ({
                 />
                 <span className="text-sm text-muted-foreground">%</span>
                 <span className="text-sm ml-1">${split.amount.toFixed(2)}</span>
+              </div>
+            </div>
+          )}
+
+          {type === "exact" && (
+            <div className="flex items-center gap-4 flex-1">
+              <div className="flex-1"></div>
+              <div className="flex gap-1 items-center">
+                <span className="text-sm text-muted-foreground">$</span>
+
+                <Input
+                  type="number"
+                  min="0"
+                  max={amount * 2} //allow values even higher than total for flexabilty
+                  step="0.01"
+                  value={split.amount.toFixed(2)}
+                  onChange={(e) =>
+                    updateExactSplit(split.userId, e.target.value)
+                  }
+                  className="w-24 h-8"
+                />
+                <span className="text-sm text-muted-foreground ml-1">
+                  ({split.percentage.toFixed(1)}%)
+                </span>
               </div>
             </div>
           )}
