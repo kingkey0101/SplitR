@@ -16,7 +16,7 @@ import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import CategorySelector from "./category-selector";
@@ -70,6 +70,21 @@ const ExpenseForm = ({ type, onSuccess }) => {
 
   const amountValue = watch("amount");
   const paidByUserId = watch("paidByUserId");
+
+  //when a suer is added or removed update the participant list
+  useEffect(() => {
+    if (participants.length === 0 && currentUser) {
+      //always add the current user as participant
+      setParticipants([
+        {
+          id: currentUser._id,
+          name: currentUser.name,
+          email: currentUser.email,
+          imageUrl: currentUser.imageUrl,
+        },
+      ]);
+    }
+  }, [currentUser, participants]);
 
   const onSubmit = async (data) => {};
 
@@ -160,7 +175,21 @@ const ExpenseForm = ({ type, onSuccess }) => {
         {type === "group" && (
           <div className="space-y-2">
             <Label>Group</Label>
-            <GroupSelector />
+            <GroupSelector
+              onChange={(group) => {
+                //only update if the group has changed to prevent loops
+                if (!selectedGroup || selectedGroup.id !== group.id) {
+                  setSelectedGroup(group);
+                  setValue("groupId", group.id);
+
+                  //update participants w/ group members
+                  if (group.members && Array.isArray(group.members)) {
+                    //set the participants once, don't reset if the same
+                    setParticipants(group.members);
+                  }
+                }
+              }}
+            />
 
             {participants.length <= 1 && (
               <p className="text-xs text-amber-600">
@@ -172,7 +201,10 @@ const ExpenseForm = ({ type, onSuccess }) => {
         {type === "individual" && (
           <div className="space-y-2">
             <Label>Participants</Label>
-            <ParticipantSelector />
+            <ParticipantSelector
+              participants={participants}
+              onParticipantsChange={setParticipants}
+            />
 
             {!selectedGroup && (
               <p className="text-xs text-amber-600">
@@ -219,19 +251,19 @@ const ExpenseForm = ({ type, onSuccess }) => {
               <p className="text-sm text-muted-foreground">
                 Split equally among all participants
               </p>
-              <SplitSelector />
+              <SplitSelector type='equal'/>
             </TabsContent>
             <TabsContent value="percentage" className="pt-4">
               <p className="text-sm text-muted-foreground">
                 Split by percentage
               </p>
-              <SplitSelector />
+              <SplitSelector type='percentage'/>
             </TabsContent>
             <TabsContent value="exact" className="pt-4">
               <p className="text-sm text-muted-foreground">
                 Enter exact amounts
               </p>
-              <SplitSelector />
+              <SplitSelector type='exact'/>
             </TabsContent>
           </Tabs>
         </div>
