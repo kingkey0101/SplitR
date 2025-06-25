@@ -161,3 +161,71 @@ export const deleteExpense = mutation({
     return { success: true };
   },
 });
+export const getGroupOrMembers = query({
+  args: {
+    groupId: v.optional(v.id("groups")), //optional-if provided will return details for just this group
+  },
+  handler: async (ctx, args) => {
+    const currentUser = await ctx.runQuery(internal.users.getCurrentUser);
+
+    //get all groups where the user is a member
+    const allGroups = await ctx.db.query("groups").collect();
+    const userGroups = allGroups.filter((group) =>
+      group.members.some((member) => member.userId === currentUser._id)
+    );
+
+    if (args.groupId) {
+      const selectedGroup = userGroups.find(
+        (group) => group._id === args.groupId
+      );
+
+      if (!selectedGroup) {
+        throw new Error("Group not found or you're not a member");
+      }
+
+      const memberDetails = await Promise.all(
+        selectedGroup.members.map(async (member) => {
+          const user = await ctx.db.get(member.userId);
+          if (!user) return null;
+
+          return {
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            imageUrl: user.imageUrl,
+            role: member.role,
+          };
+        })
+      );
+
+      const validMembers = memberDetails.filter((member) => member !== null);
+
+      return {
+        selectedGroup: {
+          id: selectedGroup._id,
+          name: selectedGroup.name,
+          description: selectedGroup.description,
+          createdBy: selectedGroup.createdBy,
+          members: validMembers,
+        },
+        groups: userGroups.map((group) => ({
+          id: group._id,
+          name: group.name,
+          description: group.description,
+          memberCount: group.members.length,
+        })),
+      };
+    } else {
+      //just return list of groups without member details
+      return {
+        selectedGroup: null,
+        groups: userGroups.map((group) => ({
+          id: group._id,
+          name: group.name,
+          description: group.description,
+          memberCount: group.members.length,
+        })),
+      };
+    }
+  },
+});
