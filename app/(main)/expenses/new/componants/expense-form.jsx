@@ -112,8 +112,14 @@ const ExpenseForm = ({ type, onSuccess }) => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
-            Category selector component
-            <CategorySelector />
+            <CategorySelector
+              categories={categories || []}
+              onChange={(categoryId) => {
+                if (categoryId) {
+                  setValue("category", categoryId);
+                }
+              }}
+            />
           </div>
 
           <div className="space-y-2">
@@ -229,6 +235,15 @@ const ExpenseForm = ({ type, onSuccess }) => {
             </TabsContent>
           </Tabs>
         </div>
+      </div>
+
+      <div className="flex justify-end">
+        <Button
+          type="submit"
+          disabled={isSubmitting || participants.length <= 1}
+        >
+          {isSubmitting ? "Creating..." : "Create Expense"}
+        </Button>
       </div>
     </form>
   );
