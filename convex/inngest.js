@@ -135,7 +135,7 @@ export const getUsersWithExpenses = query({
         .collect();
 
       const splitExpenses = allRecentExpenses.filter((expenses) =>
-        expenses.splits.come((split) => split.userId === user._id)
+        expenses.splits.some((split) => split.userId === user._id)
       );
 
       const userExpenses = [...new Set([...paidExpenses, ...splitExpenses])];
