@@ -218,7 +218,7 @@ const ExpenseForm = ({ type, onSuccess }) => {
                 <Calendar
                   mode="single"
                   selected={selectedDate}
-                  onSelect={(data) => {
+                  onSelect={(date) => {
                     setSelectedDate(date);
                     setValue("date", date);
                   }}
