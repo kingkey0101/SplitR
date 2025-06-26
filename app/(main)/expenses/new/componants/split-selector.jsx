@@ -264,7 +264,7 @@ const SplitSelector = ({
       )}
 
       {type === "exact" && !isAmountValid && (
-        <div>
+        <div className="text-sm text-amber-600 mt-2">
           The sum of all splits (${totalAmount.toFixed(2)}) should equal the
           total amount (${amount.toFixed(2)}).
         </div>

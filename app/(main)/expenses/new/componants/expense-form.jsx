@@ -24,6 +24,7 @@ import GroupSelector from "./group-selector";
 import ParticipantSelector from "./participant-selector";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import SplitSelector from "./split-selector";
+import { toast } from "sonner";
 
 const expenseSchema = z.object({
   description: z.string().min(1, "Description is required"),
@@ -86,7 +87,63 @@ const ExpenseForm = ({ type, onSuccess }) => {
     }
   }, [currentUser, participants]);
 
-  const onSubmit = async (data) => {};
+  const onSubmit = async (data) => {
+    try {
+      const amount = parseFloat(data.amount);
+
+      //prep splits in the format expected from api
+      const formattedSplits = splits.map((split) => ({
+        userId: split.userId,
+        amount: split.amount,
+        paid: split.userId === data.paidByUserId,
+      }));
+
+      //validate splits add up to the total w/sm tolerance
+      const totalSplitAmount = formattedSplits.reduce(
+        (sum, split) => sum + split.amount,
+        0
+      );
+
+      const tolerance = 0.01;
+      if (Math.abs(totalSplitAmount - amount) > tolerance) {
+        toast.error(
+          `Split amounts don't add up to total. Please adjust your splits.`
+        );
+        return;
+      }
+
+      //check groupId
+      const groupId = type === "individual" ? undefined : data.groupId;
+
+      //create the expense
+      await createExpense.mutate({
+        description: data.description,
+        amount: amount,
+        category: data.category || "Other",
+        date: data.date.getTime(), //convert to timestamp
+        paidByUserId: data.paidByUserId,
+        splitType: data.splitType,
+        splits: formattedSplits,
+        groupId,
+      });
+
+      //showing success toast
+      toast.success("Expense successfully created!");
+      reset(); //restting form
+
+
+      //going to users page after expense creation(if individual expens)
+      const otherParticipant = participants.find(
+        (p) => p.id !== currentUser._id
+      );
+      const otherUserId = otherParticipant?.id;
+
+      //if group expense-group expense
+      onSuccess(type === 'individual' ? otherUserId : groupId);
+    } catch (error) {
+      toast.error('Failed to create expense:' + error.message);
+    }
+  };
 
   if (!currentUser) return null;
 
