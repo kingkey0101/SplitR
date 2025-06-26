@@ -72,7 +72,8 @@ const SplitSelector = ({
     );
     //calc percent
     const newTotalPercentage = newSplits.reduce(
-      (sum, split) => sum + split.percentage
+      (sum, split) => sum + split.percentage,
+      0
     );
 
     setTotalAmount(newTotalAmount);
@@ -103,7 +104,8 @@ const SplitSelector = ({
     );
     //recalc percent
     const newTotalPercentage = updatedSplits.reduce(
-      (sum, split) => sum + split.percentage
+      (sum, split) => sum + split.percentage,
+      0
     );
 
     setTotalAmount(newTotalAmount);
@@ -138,7 +140,8 @@ const SplitSelector = ({
     );
     //recalc percent
     const newTotalPercentage = updatedSplits.reduce(
-      (sum, split) => sum + split.percentage
+      (sum, split) => sum + split.percentage,
+      0
     );
 
     setTotalAmount(newTotalAmount);
@@ -234,6 +237,38 @@ const SplitSelector = ({
           )}
         </div>
       ))}
+
+      <div className="flex justify-between border-t pt-3 mt-3">
+        <span className="font-medium">Total</span>
+        <div className="text-right">
+          <span
+            className={`font-medium ${isAmountValid ? "text-amber-600" : ""}`}
+          >
+            ${totalAmount.toFixed(2)}
+          </span>
+          {type !== "equal" && (
+            <span
+              className={`text-sm ml-2 ${!isPercentageValid ? "text-amber-600" : ""}`}
+            >
+              ({totalPercentage.toFixed(1)}%)
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* validation warning */}
+      {type === "percentage" && !isPercentageValid && (
+        <div className="text-sm text-amber-600 mt-2">
+          The percentages should add up to 100%.
+        </div>
+      )}
+
+      {type === "exact" && !isAmountValid && (
+        <div>
+          The sum of all splits (${totalAmount.toFixed(2)}) should equal the
+          total amount (${amount.toFixed(2)}).
+        </div>
+      )}
     </div>
   );
 };
