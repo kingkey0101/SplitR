@@ -66,7 +66,7 @@ const GroupPage = () => {
           </div>
           <div className="flex gap-2">
             <Button asChild variant="outline">
-              <Link href={`/settlements/user/${params.id}`}>
+              <Link href={` /settlements/group/${params.id}`}>
                 <ArrowLeftRight className="mr-2 h-4 w-4" />
                 Settle up
               </Link>
@@ -87,7 +87,7 @@ const GroupPage = () => {
               <CardTitle className="text-xl">Group Balances</CardTitle>
             </CardHeader>
             <CardContent>
-              <GroupBalances balances={balances}/>
+              <GroupBalances balances={balances} />
             </CardContent>
           </Card>
         </div>
@@ -97,7 +97,7 @@ const GroupPage = () => {
               <CardTitle className="text-xl">Members</CardTitle>
             </CardHeader>
             <CardContent>
-              <GroupMembers members={members}/>
+              <GroupMembers members={members} />
             </CardContent>
           </Card>
         </div>
