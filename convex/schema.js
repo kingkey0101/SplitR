@@ -57,8 +57,8 @@ export default defineSchema({
     relatedExpenseIds: v.optional(v.array(v.id("expenses"))), //expenses settlement covers
     createdBy: v.id("users"), //ref to users table in db
   })
-  .index('by_group', ['groupId'])
-  .index('by_user_and_group', ['paidByUserId', 'groupId'])
-  .index('by_receiver_and_group', ['receivedByUserId', 'groupId'])
-  .index('by_date', ['date']),
+    .index("by_group", ["groupId"])
+    .index("by_user_and_group", ["paidByUserId", "groupId"])
+    .index("by_receiver_and_group", ["receivedByUserId", "groupId"])
+    .index("by_date", ["date"]),
 });

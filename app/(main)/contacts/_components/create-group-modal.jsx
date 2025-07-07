@@ -241,8 +241,7 @@ const CreateGroupModal = ({ isOpen, onClose, onSuccess }) => {
                             </div>
                           </CommandItem>
                         ))}
-                        <CommandItem>Search Emoji</CommandItem>
-                        <CommandItem>Calculator</CommandItem>
+                        <CommandItem></CommandItem>
                       </CommandGroup>
                     </CommandList>
                   </Command>

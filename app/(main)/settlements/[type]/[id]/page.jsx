@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Users } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import SettlementForm from "../settlement-form";
 
 export default function SettlementPage() {
   const params = useParams();
@@ -68,7 +69,7 @@ export default function SettlementPage() {
               <Avatar className="h-10 w-10">
                 <AvatarImage src={data?.counterpart?.imageUrl} />
                 <AvatarFallback>
-                  {dara?.counterpart?.name?.charAt(0) || "?"}
+                  {data?.counterpart?.name?.charAt(0) || "?"}
                 </AvatarFallback>
               </Avatar>
             ) : (
@@ -82,13 +83,11 @@ export default function SettlementPage() {
           </div>
         </CardHeader>
         <CardContent>
-
-          {/* <SettlementForm
+          <SettlementForm
             entityType={type}
             entityData={data}
             onSuccess={handleSuccess}
-          /> */}
-          
+          />
         </CardContent>
       </Card>
     </div>

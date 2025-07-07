@@ -114,14 +114,14 @@ export const getSettlementData = query({
         //fetch settlements for user && other user
         const mySettlements = await ctx.db
           .query("settlements")
-          .withIndex("by_receiver_and_group", (q) =>
+          .withIndex("by_user_and_group", (q) =>
             q.eq("paidByUserId", me._id).eq("groupId", undefined)
           )
           .collect();
 
         const otherUserSettlements = await ctx.db
           .query("settlements")
-          .withIndex("by_receiver_and_group", (q) =>
+          .withIndex("by_user_and_group", (q) =>
             q.eq("paidByUserId", other._id).eq("groupId", undefined)
           )
           .collect();
